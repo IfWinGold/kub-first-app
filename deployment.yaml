@@ -29,6 +29,13 @@ spec: #deployment 구성 정의
       containers:
         - name: second-node
           image: jsu2956/kub-first-app:first
+          livenessProbe: #컨테이너가 구동되어 실행 중인지를 검사하도록 정의 ,디폴트 값이 작동하지 않는 어플리케이션을 위해서 등 필요함.
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 10 #작업을 수행해야 하는 빈도를 정의
+            initialDelaySeconds: 5 #쿠버네티스가 처음으로 상태를 확인할 때까지 기다릴 시간
+
         #- name: ...
         #  image: ...
 
