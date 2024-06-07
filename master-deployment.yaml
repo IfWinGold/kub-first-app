@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector: #selector는 이 리소스에게 제어되거나, 연결되어야 하는 다른 리소스를 식별
+    app: second-app #app:second-app 레이블을 가진 모든 pod는 Service에 의해 제어됨
+  ports:
+    - protocol: 'TCP'
+      port: 80
+      targetPort: 8080
+    #- protocol: 'TCP'
+    #  port: 443
+    #  targetPort: 443
+  type: LoadBalancer 
+--- #개의 '-'로 구분선을 지을 수 있음. 그리고 service,deployment를 하나에 결합하는 경우 service를 먼저 배치하는것이 좋음
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app-deployment
+spec: #deployment 구성 정의
+  replicas: 1 #처음 생성할 pod 개수
+  selector: #selector는 이 리소스에게 제어되거나, 연결되어야 하는 다른 리소스를 식별
+    matchLabels: #제어되어야 하는 pod의 키-값 쌍을 추가,
+      app: second-app #second-app 값의 app 레이블을 가진 모든 pod과
+      tier: backend #backend 값의 tier 레이블을 가진 모든 pod가 해당 deployment에 의해 제어되어야 한다고 지정.
+  template: #생성될 pod을 정의
+    metadata:
+      labels: #key,value 처럼 이름을 커스텀의서 정의 가능
+        app: second-app
+        tier: backend
+        #example
+        #key: value
+        #test: testValue
+    spec: #pod의 사양 정의 
+      containers:
+        - name: second-node
+          image: jsu2956/kub-first-app:first
+        #- name: ...
+        #  image: ...
+

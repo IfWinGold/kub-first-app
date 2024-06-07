@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app-deployment
+  labels: #'kubectl delete deployments,service -l group=example'로 라벨지정 삭제 가능
+    group: example
+spec: #deployment 구성 정의
+  replicas: 1 #처음 생성할 pod 개수
+  selector: #selector는 이 리소스에게 제어되거나, 연결되어야 하는 다른 리소스를 식별
+    matchLabels: #제어되어야 하는 pod의 키-값 쌍을 추가, service의 selector에 있는것과 동일한 기능
+      app: second-app #second-app 값의 app 레이블을 가진 모든 pod과
+      tier: backend #backend 값의 tier 레이블을 가진 모든 pod가 해당 deployment에 의해 제어되어야 한다고 지정.
+    #-------------matchExpressions-----------
+    #https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#labelselectorrequirement-v1-meta
+
+    #matchExpressions: #matchLabels보다 더 많은 구성 옵션을 가진 방법
+    #  - {key: app, operator: In, values: [second-app, first-app]} #operator종류는 In,NotIn,Exists,DoesNotExist
+    #-----------------------------------
+
+  template: #생성될 pod을 정의
+    metadata:
+      labels: #key,value 처럼 이름을 커스텀의서 정의 가능
+        app: second-app
+        tier: backend
+        #example
+        #key: value
+        #test: testValue
+    spec: #pod의 사양 정의 
+      containers:
+        - name: second-node
+          image: jsu2956/kub-first-app:first
+        #- name: ...
+        #  image: ...
+
